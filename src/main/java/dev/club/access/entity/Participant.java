@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -21,9 +20,6 @@ public class Participant {
     private Long id;
     private String fullName;
     private LocalDate birthDate;
-    /** Уникальный идентификатор QR-кода участника. */
-    @Column(unique = true)
-    private UUID qrUuid;
 
     @Override
     public String toString() {
@@ -31,7 +27,6 @@ public class Participant {
                 "id=" + id +
                 ", fullName='" + fullName + '\'' +
                 ", birthDate=" + birthDate +
-                ", qrUuid=" + qrUuid +
                 '}';
     }
 }

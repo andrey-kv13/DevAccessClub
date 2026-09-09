@@ -1,8 +1,9 @@
 package dev.club.access.controller;
 
-import dev.club.access.dto.DTO;
+import dev.club.access.dto.SimulateScanResponse;
 import dev.club.access.entity.Participant;
 import dev.club.access.service.DevService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,16 +14,13 @@ import java.util.List;
 /** Dev API: подготовка данных и симуляция сканирования. Не для prod. */
 @RequestMapping("/api/dev")
 @RestController
+@RequiredArgsConstructor
 public class DevController {
     private final DevService devService;
 
-    public DevController(DevService devService) {
-        this.devService = devService;
-    }
-
     /** Случайный участник → checkAccess. */
     @PostMapping("/simulate-scan")
-    public DTO.SimulateScanResponse simulateScan(){
+    public SimulateScanResponse simulateScan(){
         return devService.simulateScan();
 
     }

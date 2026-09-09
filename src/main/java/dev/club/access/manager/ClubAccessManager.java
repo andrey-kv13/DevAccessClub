@@ -1,28 +1,31 @@
 package dev.club.access.manager;
 
 import dev.club.access.model.AccessStatus;
+import dev.club.access.repository.QrCodeRepository;
 import dev.club.access.service.AccessService;
 import dev.club.access.service.DevService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
+@RequiredArgsConstructor
 public class ClubAccessManager {
     private final DevService devService;
     private final AccessService accessService;
+    private final QrCodeRepository qrCodeRepository;
 
-
-    public ClubAccessManager(DevService devService, AccessService accessService) {
-        this.devService = devService;
-        this.accessService = accessService;
-    }
-    
-    public void runDemo(){
+    public void runDemo() {
         devService.reset();
         var participants = devService.generateParticipants(3);
-        var qrUuid = participants.get(0).getQrUuid();
+        var participant = participants.get(0);
+        var qrCode = qrCodeRepository.findByParticipant(participant).orElseThrow();
 
-        var first = accessService.checkAccess(qrUuid);
-        var second = accessService.checkAccess(qrUuid);
+        UUID uuid = qrCode.getUuid();
+
+        var first = accessService.checkAccess(uuid);
+        var second = accessService.checkAccess(uuid);
 
         if (first != AccessStatus.GRANTED) {
             throw new IllegalStateException(

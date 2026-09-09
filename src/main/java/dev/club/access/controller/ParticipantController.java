@@ -1,29 +1,30 @@
 package dev.club.access.controller;
 
+import dev.club.access.dto.CreateParticipantResponse;
 import dev.club.access.entity.Participant;
 import dev.club.access.service.ParticipantService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-/** Регистрация и просмотр участников. */
+/**
+ * Регистрация и просмотр участников.
+ */
 @RequestMapping("/api/participants")
 @RestController
+@RequiredArgsConstructor
 public class ParticipantController {
     private final ParticipantService participantService;
 
-    public ParticipantController(ParticipantService participantService) {
-        this.participantService = participantService;
-    }
-
     @GetMapping
-    public List<Participant> findAll(){
+    public Page<Participant> findAll(Pageable pageable) {
 
-        return participantService.findAll();
+        return participantService.findAll(pageable);
     }
 
     @PostMapping
-    public Participant create(@RequestBody Participant participants){
-        return participantService.create(participants);
+    public CreateParticipantResponse create(@RequestBody Participant participant) {
+        return participantService.create(participant);
     }
 }

@@ -11,10 +11,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
 
 @WebMvcTest(AccessController.class)
 public class AccessControllerTest {
@@ -29,7 +31,6 @@ public class AccessControllerTest {
 
     @Test
     void checkAccess_validRequest_returnsGranted() throws Exception {
-
         when(accessService.checkAccess(uuid)).thenReturn(AccessStatus.GRANTED);
 
         mockMvc.perform(post("/api/access")
@@ -40,13 +41,10 @@ public class AccessControllerTest {
                 .andExpect(result -> assertEquals("\"GRANTED\"", result.getResponse().getContentAsString(),
                         "Тело ответа должно содержать GRANTED"));
         verify(accessService, times(1)).checkAccess(uuid);
-
     }
 
     @Test
     void incorrectUuidReturns400Code() throws Exception {
-
-
         mockMvc.perform(post("/api/access")
                         .contentType(APPLICATION_JSON)
                         .content("{\"qrUuid\":\"" + errorUuid + "\"}"))
@@ -54,13 +52,5 @@ public class AccessControllerTest {
                         "POST /api/access с некорректным UUID должен вернуть 400"));
 
         verifyNoInteractions(accessService);
-
     }
-
-
 }
-
-
-
-
-

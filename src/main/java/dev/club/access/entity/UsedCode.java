@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /** Факт однократного использования QR-кода для входа. */
 @Entity
@@ -21,19 +20,15 @@ public class UsedCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime usedAt;
-    @Column(unique = true)
-    private UUID qrUuid;
-    @ManyToOne
-    @JoinColumn(name = "participant_id")
-    private Participant participant;
+    @OneToOne(optional = false)
+    @JoinColumn(name = "qr_code_id")
+    private QrCode qrCode;
 
     @Override
     public String toString() {
         return "UsedCode{" +
                 "id=" + id +
                 ", usedAt=" + usedAt +
-                ", qrUuid=" + qrUuid +
-                ", participant=" + participant +
                 '}';
     }
 }

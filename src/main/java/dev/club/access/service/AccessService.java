@@ -1,11 +1,12 @@
 package dev.club.access.service;
 
-import dev.club.access.entity.Participant;
+import dev.club.access.entity.QrCode;
 import dev.club.access.entity.UsedCode;
 import dev.club.access.model.AccessStatus;
-import dev.club.access.repository.ParticipantRepository;
+import dev.club.access.repository.QrCodeRepository;
 import dev.club.access.repository.UsedCodeRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,15 +18,10 @@ import java.util.UUID;
  * Проверка QR-кода при входе в клуб.
  */
 @Service
+@RequiredArgsConstructor
 public class AccessService {
     private final UsedCodeRepository usedCodeRepository;
-    private final ParticipantRepository participantRepository;
-
-
-    public AccessService(UsedCodeRepository usedCodeRepository, ParticipantRepository participantRepository) {
-        this.usedCodeRepository = usedCodeRepository;
-        this.participantRepository = participantRepository;
-    }
+    private final QrCodeRepository qrCodeRepository;
 
     /**
      * Первое успешное сканирование фиксируется в used_codes и возвращает GRANTED.
@@ -33,30 +29,24 @@ public class AccessService {
      */
     @Transactional
     public AccessStatus checkAccess(UUID qrUuid) {
-        Optional<Participant> optionalParticipant = participantRepository.findByQrUuid(qrUuid);
 
-        if (optionalParticipant.isEmpty()) {
+        Optional<QrCode> optionalQrCode = qrCodeRepository.findByUuid(qrUuid);
 
+        if (optionalQrCode.isEmpty()) {
             return AccessStatus.UNKNOWN;
         }
 
-        if (usedCodeRepository.existsByQrUuid(qrUuid)) {
+        QrCode qrCode = optionalQrCode.get();
 
+        if (usedCodeRepository.existsByQrCode(qrCode)) {
             return AccessStatus.ALREADY_USED;
-
-        } else {
-
-            Participant participant = optionalParticipant.get();
-            UsedCode usedCode = new UsedCode();
-            usedCode.setQrUuid(qrUuid);
-            usedCode.setParticipant(participant);
-            usedCode.setUsedAt(LocalDateTime.now());
-            usedCodeRepository.save(usedCode);
-
-            return AccessStatus.GRANTED;
         }
 
+        UsedCode usedCode = new UsedCode();
+        usedCode.setQrCode(qrCode);
+        usedCode.setUsedAt(LocalDateTime.now());
+        usedCodeRepository.save(usedCode);
+
+        return AccessStatus.GRANTED;
     }
-
-
 }

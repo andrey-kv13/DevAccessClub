@@ -1,7 +1,9 @@
 package dev.club.access.service;
 
+import dev.club.access.dto.CreateParticipantResponse;
 import dev.club.access.entity.Participant;
 import dev.club.access.repository.ParticipantRepository;
+import dev.club.access.repository.QrCodeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,32 +14,32 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class ParticipantServiceTest {
-    private  ParticipantService participantService;
-    private  Participant participant;
+    private ParticipantService participantService;
+    private Participant participant;
     private ParticipantRepository participantRepository;
+    private QrCodeRepository qrCodeRepository;
 
     @BeforeEach
     void setUp() {
         participantRepository = mock(ParticipantRepository.class);
-        participantService = new ParticipantService(participantRepository);
+        qrCodeRepository = mock(QrCodeRepository.class);
+        this.participantService = new ParticipantService(participantRepository, qrCodeRepository);
 
     }
 
     @Test
-    void create_generatesQrUuidAndSaves(){
+    void create_generatesQrUuidAndSaves() {
         participant = new Participant();
         participant.setFullName("TestParticipant");
         participant.setBirthDate(LocalDate.parse("1993-04-19"));
 
         when(participantRepository.save(any())).thenReturn(participant);
 
-        Participant result = participantService.create(participant);
+        CreateParticipantResponse result = participantService.create(participant);
 
-        assertNotNull(result.getQrUuid(),
-                "После create() участник должен получить qrUuid");
+        assertNotNull(result.qrUuid(),
+                "После create() ответ должен содержать qrUuid");
         verify(participantRepository, times(1)).save(any());
-
+        verify(qrCodeRepository, times(1)).save(any());
     }
-
-
 }

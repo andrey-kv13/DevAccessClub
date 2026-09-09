@@ -28,11 +28,14 @@ public class ClubAccessIntegrationTest {
 
     @Test
     public void checkParticipantAccessStatus() {
+
         Participant participant = new Participant();
         participant.setFullName("Test User integration");
         participant.setBirthDate(LocalDate.parse("1993-04-19"));
-        participant = participantService.create(participant);
-        UUID qrUuid = participant.getQrUuid();
+
+        var response = participantService.create(participant);
+
+        UUID qrUuid = response.qrUuid();
 
         AccessStatus resultGranted = accessService.checkAccess(qrUuid);
         AccessStatus resultUsed = accessService.checkAccess(qrUuid);
@@ -41,7 +44,6 @@ public class ClubAccessIntegrationTest {
                 "Первое сканирование должно вернуть GRANTED");
         assertEquals(AccessStatus.ALREADY_USED, resultUsed,
                 "Повторное сканирование того же QR должно вернуть ALREADY_USED");
-
 
     }
 
