@@ -1,7 +1,7 @@
 package dev.club.access.controller;
 
+import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.dto.CreateParticipantResponse;
-import dev.club.access.entity.Participant;
 import dev.club.access.service.ParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,13 +18,13 @@ public class ParticipantController {
     private final ParticipantService participantService;
 
     @GetMapping
-    public Page<Participant> findAll(Pageable pageable) {
+    public Page<CreateParticipantResponse> findAll(Pageable pageable) {
 
         return participantService.findAll(pageable);
     }
 
     @PostMapping
-    public CreateParticipantResponse create(@RequestBody Participant participant) {
-        return participantService.create(participant);
+    public CreateParticipantResponse create(@RequestBody CreateParticipantRequest createParticipantRequest) {
+        return participantService.create(createParticipantRequest);
     }
 }

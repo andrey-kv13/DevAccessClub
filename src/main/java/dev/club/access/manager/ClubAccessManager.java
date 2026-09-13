@@ -20,7 +20,9 @@ public class ClubAccessManager {
         devService.reset();
         var participants = devService.generateParticipants(3);
         var participant = participants.get(0);
-        var qrCode = qrCodeRepository.findByParticipant(participant).orElseThrow();
+        var qrCode = qrCodeRepository.findByParticipant(participant)
+                .orElseThrow(() -> new IllegalStateException(
+                        "QR-код не найден для участника id = " + participant.getId()));
 
         UUID uuid = qrCode.getUuid();
 

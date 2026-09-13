@@ -1,7 +1,9 @@
 package dev.club.access.controller;
 
+import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.dto.CreateParticipantResponse;
 import dev.club.access.entity.Participant;
+import dev.club.access.entity.QrCode;
 import dev.club.access.service.ParticipantService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -34,16 +34,17 @@ public class ParticipantControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+
     @MockitoBean
     private ParticipantService participantService;
 
     @Test
     public void findAllReturnsParticipants() throws Exception {
-        participant = new Participant();
-        participant.setFullName("TestParticipant");
-        participant.setBirthDate(LocalDate.parse("1993-04-19"));
 
-        when(participantService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(participant)));
+        CreateParticipantResponse response = new CreateParticipantResponse(1L, "TestParticipant", LocalDate.parse("1989-08-02"), uuid);
+
+        when(participantService.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(response)));
 
         mockMvc.perform(get("/api/participants"))
                 .andExpect(result -> assertEquals(200, result.getResponse().getStatus(),
@@ -54,9 +55,8 @@ public class ParticipantControllerTest {
 
     @Test
     public void createParticipantSuccess() throws Exception {
-        participant = new Participant();
-        participant.setFullName("Test_participant_12");
-        participant.setBirthDate(LocalDate.parse("1989-08-02"));
+        CreateParticipantRequest createParticipantRequest = new CreateParticipantRequest("TestParticipant", LocalDate.parse("1989-08-02"));
+
 
         CreateParticipantResponse createParticipantResponse = new CreateParticipantResponse(
                 1L,
@@ -65,17 +65,17 @@ public class ParticipantControllerTest {
                 uuid
         );
 
-        when(participantService.create(any(Participant.class))).thenReturn(createParticipantResponse);
+        when(participantService.create(any(CreateParticipantRequest.class))).thenReturn(createParticipantResponse);
 
         mockMvc.perform(post("/api/participants")
                         .contentType(APPLICATION_JSON)
-                        .content("{\"fullName\":\"" + participant.getFullName() + "\"," +
-                                "\"birthDate\":\"" + participant.getBirthDate() + "\"}"))
+                        .content("{\"fullName\":\"" + createParticipantRequest.fullName() + "\"," +
+                                "\"birthDate\":\"" + createParticipantRequest.birthDate() + "\"}"))
                 .andExpect(result -> assertEquals(200, result.getResponse().getStatus(),
                         "POST /api/participants должен вернуть 200"))
                 .andExpect(jsonPath("$.fullName").value("Test_participant_12"))
                 .andExpect(jsonPath("$.qrUuid").value(uuid.toString()));
 
-        verify(participantService, times(1)).create(any(Participant.class));
+        verify(participantService, times(1)).create(any(CreateParticipantRequest.class));
     }
 }

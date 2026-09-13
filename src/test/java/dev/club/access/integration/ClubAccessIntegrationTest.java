@@ -1,6 +1,6 @@
 package dev.club.access.integration;
 
-import dev.club.access.entity.Participant;
+import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.model.AccessStatus;
 import dev.club.access.service.AccessService;
 import dev.club.access.service.ParticipantService;
@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 public class ClubAccessIntegrationTest {
 
-
     @Autowired
     private ParticipantService participantService;
 
@@ -28,14 +27,14 @@ public class ClubAccessIntegrationTest {
 
     @Test
     public void checkParticipantAccessStatus() {
+        CreateParticipantRequest createParticipantRequest = new CreateParticipantRequest("Test_user_1",
+                LocalDate.parse("1993-04-19"));
 
-        Participant participant = new Participant();
-        participant.setFullName("Test User integration");
-        participant.setBirthDate(LocalDate.parse("1993-04-19"));
 
-        var response = participantService.create(participant);
+        var response = participantService.create(createParticipantRequest);
 
         UUID qrUuid = response.qrUuid();
+
 
         AccessStatus resultGranted = accessService.checkAccess(qrUuid);
         AccessStatus resultUsed = accessService.checkAccess(qrUuid);
@@ -46,6 +45,4 @@ public class ClubAccessIntegrationTest {
                 "Повторное сканирование того же QR должно вернуть ALREADY_USED");
 
     }
-
-
 }

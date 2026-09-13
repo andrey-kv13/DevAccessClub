@@ -1,5 +1,6 @@
 package dev.club.access.service;
 
+import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.dto.SimulateScanResponse;
 import dev.club.access.entity.Participant;
 import dev.club.access.entity.QrCode;
@@ -34,7 +35,9 @@ public class DevService {
             throw new IllegalStateException("список пустой");
         }
         Participant chosen = list.get(ThreadLocalRandom.current().nextInt(list.size()));
-        QrCode qrCode = qrCodeRepository.findByParticipant(chosen).orElseThrow();
+        QrCode qrCode = qrCodeRepository.findByParticipant(chosen)
+                .orElseThrow(() -> new IllegalStateException(
+                        "QR-код не найден для участника id=" + chosen.getId()));
         UUID uuid = qrCode.getUuid();
         AccessStatus status = accessService.checkAccess(uuid);
         return new SimulateScanResponse(status, chosen);
@@ -51,11 +54,10 @@ public class DevService {
 
     public List<Participant> generateParticipants(int count) {
         for (int i = 0; i < count; i++) {
-            Participant p = new Participant();
-            p.setFullName("User - " + (i + 1));
-            p.setBirthDate(LocalDate.of(1990, 1, 1).plusDays(i));
+            CreateParticipantRequest createParticipantRequest = new CreateParticipantRequest(("User - " + (i + 1)),
+                    LocalDate.of(1990, 1, 1).plusDays(i));
 
-            participantService.create(p);
+            participantService.create(createParticipantRequest);
         }
 
         return participantRepository.findAll();
