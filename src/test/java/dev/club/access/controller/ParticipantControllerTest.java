@@ -2,8 +2,6 @@ package dev.club.access.controller;
 
 import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.dto.CreateParticipantResponse;
-import dev.club.access.entity.Participant;
-import dev.club.access.entity.QrCode;
 import dev.club.access.service.ParticipantService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ParticipantController.class)
 public class ParticipantControllerTest {
 
-    private Participant participant;
     private UUID uuid = UUID.randomUUID();
 
     @Autowired

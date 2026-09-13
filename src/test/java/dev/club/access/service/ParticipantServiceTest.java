@@ -3,14 +3,12 @@ package dev.club.access.service;
 import dev.club.access.dto.CreateParticipantRequest;
 import dev.club.access.dto.CreateParticipantResponse;
 import dev.club.access.entity.Participant;
-import dev.club.access.entity.QrCode;
 import dev.club.access.repository.ParticipantRepository;
 import dev.club.access.repository.QrCodeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
